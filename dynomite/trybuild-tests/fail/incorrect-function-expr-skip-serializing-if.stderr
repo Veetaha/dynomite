@@ -1,0 +1,26 @@
+error[E0618]: expected function, found `bool`
+ --> $DIR/incorrect-function-expr-skip-serializing-if.rs:5:38
+  |
+3 | #[derive(Attributes)]
+  |          ---------- call expression requires function
+4 | struct Test1 {
+5 |     #[dynomite(skip_serializing_if = "true")]
+  |                                      ^^^^^^
+
+error[E0618]: expected function, found `_`
+  --> $DIR/incorrect-function-expr-skip-serializing-if.rs:11:38
+   |
+9  | #[derive(Attributes)]
+   |          ---------- call expression requires function
+10 | struct Test2 {
+11 |     #[dynomite(skip_serializing_if = "2 + 2")]
+   |                                      ^^^^^^^
+
+error[E0057]: this function takes 0 arguments but 1 argument was supplied
+  --> $DIR/incorrect-function-expr-skip-serializing-if.rs:17:38
+   |
+15 | #[derive(Attributes)]
+   |          ---------- supplied 1 argument
+16 | struct Test3 {
+17 |     #[dynomite(skip_serializing_if = "|| true")]
+   |                                      ^^^^^^^^^ expected 0 arguments

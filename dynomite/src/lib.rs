@@ -117,6 +117,33 @@
 //!   attribute field, useful when the DynamoDB table you're interfacing with has
 //!   attributes whose names don't following Rust's naming conventions
 //!
+//! - `#[dynomite(skip_serializing_if = "expr_that_returns_function")]` - place this on a field
+//!   that should be skipped in the output map entirely if the given function returns `true`.
+//!   The signature of the function must satisfy `FnOnce(&T) -> bool`, where `T` is the type of
+//!   the field (possibly after some auto-deref coertions).
+//!
+//!   This is almost the same as [`#[serde(skip_serializing_if = "...")]`][serde-skip-serializing-if],
+//!   but it allows for writing a closure expression inline, whilst serde requires defining a function
+//!   nearby and passing only its path.
+//!
+//!   This attribute is very useful to skip serializing the empty set for example
+//!   (which is not supported by current DynamoDB version, but it may be in future)
+//!
+//!   ```
+//!   use dynomite::Attributes;
+//!   use std::collections::HashSet;
+//!
+//!   #[derive(Attributes)]
+//!   struct UniqueStrings {
+//!       #[dynomite(skip_serializing_if = "HashSet::is_empty")]
+//!       strings: HashSet<String>,
+//!
+//!       // You may use arbitrary Rust expression, but it must return a `impl FnOnce(&T) -> bool`
+//!       #[dynomite(skip_serializing_if = "|&num| num == 99")]
+//!       skip_if_99: u32,
+//!   }
+//!   ```
+//!
 //! - `#[dynomite(default)]` - use [`Default::default`] implementation of the field type
 //!   if the attribute is absent when deserializing from `Attributes`
 //!
@@ -138,7 +165,7 @@
 //!   💡 If this attribute is placed onto a field, no other `dynomite` attributes
 //!   are alowed on this field (this restriction may be relaxed in future).
 //!
-//!   This is reminiscent of [`#[serde(flatten)]`](serde-flatten). The order of
+//!   This is reminiscent of [`#[serde(flatten)]`][serde-flatten]. The order of
 //!   declaration of `flatten`ed fields matters, if the struct has to fields with
 //!   `#[dynomite(flatten)]` attribute the one that appears higher in code will
 //!   be evaluated before the other one. This is crucial when you want to collect
@@ -336,6 +363,8 @@
 //! [`Default::default`]: https://doc.rust-lang.org/stable/std/default/trait.Default.html#tymethod.default
 //! [`AttributeValue`]: https://docs.rs/rusoto_dynamodb/*/rusoto_dynamodb/struct.AttributeValue.html
 //! [`Attribute`]: trait.Attribute.html
+//! [serde-skip-serializing-if]: https://serde.rs/attr-skip-serializing.html
+//! [serde-flatten]: https://serde.rs/attr-flatten.html
 
 #![deny(missing_docs)]
 // reexported
