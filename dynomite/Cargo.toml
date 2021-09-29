@@ -41,7 +41,7 @@ lambda_runtime = "0.4.0"
 trybuild = "1.0"
 rustversion = "1.0"
 dynomite-derive = { version = "0.10.0", path = "../dynomite-derive" } # required by trybuild
-pretty_assertions = "0.7"
+pretty_assertions = "1.0"
 
 [features]
 default = [
